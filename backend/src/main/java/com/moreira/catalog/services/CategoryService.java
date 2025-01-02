@@ -20,4 +20,10 @@ public class CategoryService {
         List<Category> result = repository.findAll();
         return result.stream().map(CategoryDTO::new).toList();
     }
+
+    @Transactional(readOnly = true)
+    public CategoryDTO findById(Long id) {
+        Category entity = repository.findById(id).get();
+        return new CategoryDTO(entity);
+    }
 }
