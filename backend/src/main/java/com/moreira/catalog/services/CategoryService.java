@@ -3,6 +3,7 @@ package com.moreira.catalog.services;
 import com.moreira.catalog.dtos.CategoryDTO;
 import com.moreira.catalog.entities.Category;
 import com.moreira.catalog.repositories.CategoryRepository;
+import com.moreira.catalog.services.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,8 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public CategoryDTO findById(Long id) {
-        Category entity = repository.findById(id).get();
+        Category entity = repository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Resource not found"));
         return new CategoryDTO(entity);
     }
 }
