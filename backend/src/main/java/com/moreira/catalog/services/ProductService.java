@@ -1,7 +1,10 @@
 package com.moreira.catalog.services;
 
+import com.moreira.catalog.dtos.CategoryDTO;
 import com.moreira.catalog.dtos.ProductDTO;
+import com.moreira.catalog.entities.Category;
 import com.moreira.catalog.entities.Product;
+import com.moreira.catalog.repositories.CategoryRepository;
 import com.moreira.catalog.repositories.ProductRepository;
 import com.moreira.catalog.services.exceptions.DatabaseException;
 import com.moreira.catalog.services.exceptions.ResourceNotFoundException;
@@ -20,6 +23,9 @@ public class ProductService {
     @Autowired
     private ProductRepository repository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Transactional(readOnly = true)
     public Page<ProductDTO> findAllPaged(Pageable pageable) {
         Page<Product> result = repository.findAll(pageable);
@@ -33,29 +39,29 @@ public class ProductService {
         return new ProductDTO(entity, entity.getCategories());
     }
 
-//    @Transactional
-//    public ProductDTO insert (ProductDTO dto) {
-//        Product entity = new Product();
-//        entity.setName(dto.getName());
-//
-//        entity = repository.save(entity);
-//
-//        return new ProductDTO(entity);
-//    }
+    @Transactional
+    public ProductDTO insert (ProductDTO dto) {
+        Product entity = new Product();
+        copyDtoToEntity(dto, entity);
 
-//    @Transactional
-//    public ProductDTO update(Long id, ProductDTO dto) {
-//        try {
-//            Product entity = repository.getReferenceById(id);
-//            entity.setName(dto.getName());
-//
-//            entity = repository.save(entity);
-//
-//            return new ProductDTO(entity);
-//        } catch (EntityNotFoundException e) {
-//            throw new ResourceNotFoundException("Id not found");
-//        }
-//    }
+        entity = repository.save(entity);
+
+        return new ProductDTO(entity);
+    }
+
+    @Transactional
+    public ProductDTO update(Long id, ProductDTO dto) {
+        try {
+            Product entity = repository.getReferenceById(id);
+            copyDtoToEntity(dto, entity);
+
+            entity = repository.save(entity);
+
+            return new ProductDTO(entity);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException("Id not found");
+        }
+    }
 
     @Transactional(propagation = Propagation.SUPPORTS)
     public void delete(Long id) {
@@ -65,6 +71,20 @@ public class ProductService {
             repository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Data Integrity Fail");
+        }
+    }
+
+    private void copyDtoToEntity(ProductDTO dto, Product entity) {
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        entity.setPrice(dto.getPrice());
+        entity.setImgUrl(dto.getImgUrl());
+        entity.setDate(dto.getDate());
+
+        entity.getCategories().clear();
+        for (CategoryDTO catDTO : dto.getCategories()) {
+            Category cat = categoryRepository.getReferenceById(catDTO.getId());
+            entity.getCategories().add(cat);
         }
     }
 }
