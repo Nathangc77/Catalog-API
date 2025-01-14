@@ -1,6 +1,9 @@
 package com.moreira.catalog.dtos;
 
 import com.moreira.catalog.entities.User;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +17,12 @@ import java.util.Set;
 public class UserDTO {
 
     private Long id;
+
+    @NotBlank(message = "Required field")
     private String firstName;
     private String lastName;
+
+    @Email(message = "Invalid email")
     private String email;
 
     Set<RoleDTO> roles = new HashSet<>();

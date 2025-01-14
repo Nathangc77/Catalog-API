@@ -2,6 +2,10 @@ package com.moreira.catalog.dtos;
 
 import com.moreira.catalog.entities.Category;
 import com.moreira.catalog.entities.Product;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,10 +19,19 @@ import java.util.Set;
 public class ProductDTO {
 
     private Long id;
+
+    @Size(min = 5, max = 60, message = "The field must be between 5 and 60 characters")
+    @NotBlank(message = "Required field")
     private String name;
+
+    @NotBlank(message = "Required field")
     private String description;
+
+    @Positive(message = "Price must be positive")
     private Double price;
     private String imgUrl;
+
+    @PastOrPresent(message = "Invalid date")
     private Instant date;
 
     private List<CategoryDTO> categories = new ArrayList<>();
