@@ -3,6 +3,7 @@ package com.moreira.catalog.services;
 import com.moreira.catalog.dtos.RoleDTO;
 import com.moreira.catalog.dtos.UserDTO;
 import com.moreira.catalog.dtos.UserInsertDTO;
+import com.moreira.catalog.dtos.UserUpdateDTO;
 import com.moreira.catalog.entities.Role;
 import com.moreira.catalog.entities.User;
 import com.moreira.catalog.repositories.RoleRepository;
@@ -56,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDTO update(Long id, UserDTO dto) {
+    public UserDTO update(Long id, UserUpdateDTO dto) {
         try {
             User entity = repository.getReferenceById(id);
             copyDtoToEntity(dto, entity);

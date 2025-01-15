@@ -2,6 +2,7 @@ package com.moreira.catalog.controllers;
 
 import com.moreira.catalog.dtos.UserDTO;
 import com.moreira.catalog.dtos.UserInsertDTO;
+import com.moreira.catalog.dtos.UserUpdateDTO;
 import com.moreira.catalog.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,18 +35,18 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserDTO> insert(@Valid @RequestBody UserInsertDTO dto) {
-        UserDTO userDTO = service.insert(dto);
+        UserDTO newDTO = service.insert(dto);
 
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(userDTO).toUri();
+                .buildAndExpand(newDTO).toUri();
 
-        return ResponseEntity.created(uri).body(userDTO);
+        return ResponseEntity.created(uri).body(newDTO);
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserDTO dto) {
-        dto = service.update(id, dto);
-        return ResponseEntity.ok().body(dto);
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
+        UserDTO userDTO = service.update(id, dto);
+        return ResponseEntity.ok().body(userDTO);
     }
 
     @DeleteMapping(value = "/{id}")
