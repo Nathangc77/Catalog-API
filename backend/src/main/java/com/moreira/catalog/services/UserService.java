@@ -6,6 +6,7 @@ import com.moreira.catalog.dtos.UserInsertDTO;
 import com.moreira.catalog.dtos.UserUpdateDTO;
 import com.moreira.catalog.entities.Role;
 import com.moreira.catalog.entities.User;
+import com.moreira.catalog.projections.UserDetailsProjection;
 import com.moreira.catalog.repositories.RoleRepository;
 import com.moreira.catalog.repositories.UserRepository;
 import com.moreira.catalog.services.exceptions.DatabaseException;
@@ -15,13 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
@@ -79,6 +85,24 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Data Integrity Fail");
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<UserDetailsProjection> result = repository.searchUserRolesByUsername(username);
+
+        if(result.isEmpty()) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        User user = new User();
+        user.setEmail(username);
+        user.setPassword(result.getFirst().getPassword());
+
+        for (UserDetailsProjection p : result) {
+            user.addRole(new Role(p.getRoleId(), p.getAuthority()));
+        }
+
+        return user;
     }
 
     private void copyDtoToEntity(UserDTO dto, User entity) {
