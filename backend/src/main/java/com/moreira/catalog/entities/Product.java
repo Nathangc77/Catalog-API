@@ -1,5 +1,6 @@
 package com.moreira.catalog.entities;
 
+import com.moreira.catalog.projections.IdProjection;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
-public class Product {
+public class Product implements IdProjection<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
