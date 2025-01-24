@@ -3,6 +3,7 @@ package com.moreira.catalog.controllers.handlers;
 import com.moreira.catalog.dtos.exceptions.CustomError;
 import com.moreira.catalog.dtos.exceptions.ValidationError;
 import com.moreira.catalog.services.exceptions.DatabaseException;
+import com.moreira.catalog.services.exceptions.EmailException;
 import com.moreira.catalog.services.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,13 @@ public class ControllerExceptionHandler {
         for (FieldError f : e.getFieldErrors()) {
             err.addError(f.getField(), f.getDefaultMessage());
         }
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity<CustomError> email(EmailException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        CustomError err = new CustomError(Instant.now(), status.value(), "Email exception", request.getRequestURI());
         return ResponseEntity.status(status).body(err);
     }
 }
