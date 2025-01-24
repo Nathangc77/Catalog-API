@@ -38,6 +38,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthService authService;
+
     @Transactional(readOnly = true)
     public Page<UserDTO> findAllPaged(Pageable pageable) {
         Page<User> result = repository.findAll(pageable);
@@ -106,6 +109,11 @@ public class UserService implements UserDetailsService {
         }
 
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public UserDTO findMe() {
+        return new UserDTO(authService.authenticated());
     }
 
     private void copyDtoToEntity(UserDTO dto, User entity) {
